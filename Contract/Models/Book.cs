@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Contract.Models
 {
@@ -12,8 +11,10 @@ namespace Contract.Models
 
         [Required] public string Title { get; set; }
 
-        [AllowNull, MinLength(1000)] public string Description { get; set; }
+        [MinLength(50)] public string Description { get; set; }
 
-        public Author Author { get; set; }
+        [ForeignKey("AuthorId")] public Author Author { get; set; }
+
+        public Guid AuthorId { get; set; }
     }
 }
