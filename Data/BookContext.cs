@@ -20,7 +20,8 @@ namespace Data
 
             modelBuilder.Entity<Book>()
                 .HasOne(b => b.Author)
-                .WithMany(a => a.Books);
+                .WithMany(a => a.Books)
+                .HasForeignKey(b => b.AuthorId);
         }
     }
 }
