@@ -5,7 +5,7 @@ namespace Contract.Dto
 {
     public class UpdateAuthorDto
     {
-        public String? Name { get; set; }
-        public DateTime? BirthDate { get; set; }
+        public string Name { get; set; }
+        public DateTime BirthDate { get; set; }
     }
 }

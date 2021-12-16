@@ -33,7 +33,10 @@ namespace Core.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<Book>> GetBook(Guid id)
         {
-            var book = await _context.Books.FindAsync(id);
+            var book = await _context.Books
+                .Include(b => b.Author)
+                .FirstAsync(b => b.Id == id);
+
             if (book == null)
             {
                 return NotFound();
@@ -45,18 +48,14 @@ namespace Core.Controllers
         // PUT: api/Book/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> PatchBook(Guid id, UpdateBookDto updateBookDto)
+        public async Task<IActionResult> PutBook(Guid id, UpdateBookDto updateBookDto)
         {
-            var actionResult = await GetBook(id);
-            var book = actionResult.Value;
+            var getBookResult = await GetBook(id);
+            var book = getBookResult.Value;
 
-            if (updateBookDto.Title != null)
-                book.Title = updateBookDto.Title;
-            if (updateBookDto.Description != null)
-                book.Description = updateBookDto.Description;
-            if (updateBookDto.AuthorId != null)
-                book.AuthorId = (Guid) updateBookDto.AuthorId;
-
+            book.Title = updateBookDto.Title;
+            book.Description = updateBookDto.Description;
+            book.Author = await _context.Authors.FindAsync(updateBookDto.AuthorId);
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -66,13 +65,10 @@ namespace Core.Controllers
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(CreateBookDto createBookDto)
         {
-            var book = new Book()
-            {
-                AuthorId = createBookDto.AuthorId, Title = createBookDto.Title, Description = createBookDto.Description
-            };
+            var book = new Book() {Description = createBookDto.Description, Title = createBookDto.Title};
+            book.Author = await _context.Authors.FindAsync(createBookDto.AuthorId);
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction("GetBook", new {id = book.Id}, book);
         }
 
